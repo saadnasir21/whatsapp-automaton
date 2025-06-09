@@ -12,13 +12,15 @@ import pyperclip
 from collections import defaultdict
 
 # ========== CONFIGURATION ==========
-SHEET_NAME           = 'AUTOMATIC ORDER CONFIRMATION'  
+SHEET_NAME           = 'AUTOMATIC ORDER CONFIRMATION'
 SERVICE_ACCOUNT_FILE = r'C:\Users\hp\Downloads\divine-clone-458223-j3-f0ac4852a414.json'
 
 CHROMEDRIVER_PATH    = r'C:\Users\hp\Downloads\chromedriver.exe'
 CHROME_BINARY        = r'C:\Program Files\Google\Chrome\Application\chrome.exe'
 USER_DATA_DIR        = r'C:\Users\hp\AppData\Local\Google\Chrome\User Data'
 PROFILE_DIR          = 'Profile 2'
+# How long to wait between order checks (seconds)
+CHECK_INTERVAL       = 60
 # ====================================
 
 # --- Google Sheets setup ---
@@ -187,8 +189,8 @@ def process_orders():
                 phone = "+92" + str(entries[0][1]['Shipping Phone'])[-10:]
                 send_whatsapp_message(name, items, total, phone, rows)
 
-        print("🕒 Sleeping for 5 minutes…")
-        time.sleep(300)
+        print(f"🕒 Sleeping for {CHECK_INTERVAL} seconds…")
+        time.sleep(CHECK_INTERVAL)
 
 if __name__ == "__main__":
     process_orders()
