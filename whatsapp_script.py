@@ -91,7 +91,8 @@ def aggregate_items(entries):
                 qty = int(float(rec['Lineitem Quantity']))
             except Exception:
                 qty = 0
-        item_totals[rec['Lineitem Name']] += qty
+        item_name = str(rec.get('Lineitem Name', '')).strip()
+        item_totals[item_name] += qty
     return [(name, qty) for name, qty in item_totals.items()]
 
 def open_whatsapp_chat(phone):
@@ -104,7 +105,7 @@ def open_whatsapp_chat(phone):
 
 def send_whatsapp_message(name, items, total, phone, rows):
     """Send a grouped multi-item message and mark each row’s Msg Status."""
-    item_lines = "\n".join(f"{it} x {qty}" for it, qty in items)
+    item_lines = "\n".join(f"{it.strip()} x {qty}" for it, qty in items)
     msg = f"""Hi {name},
 
 Thank you for your order of the following item(s):
