@@ -6,6 +6,12 @@ import tkinter as tk
 from tkinter import filedialog
 import traceback
 
+# Simple helper to send a yes/no poll-like prompt
+def send_yes_no_poll():
+    """Send a placeholder text asking the recipient to reply yes or no."""
+    pyautogui.typewrite("\nPlease reply with Yes or No to confirm your order.")
+    pyautogui.press('enter')
+
 # Set up GUI for file selection
 def select_file():
     root = tk.Tk()
@@ -17,35 +23,35 @@ def select_file():
     return file_path
 
 # Function to send a WhatsApp message
-def send_confirmation_message(name, items, total_balance, phone_number, last_success):
+def send_confirmation_message(name, items, total_balance, phone_number, last_success, send_poll=False):
     # Format item list with quantities
     item_list = "\n".join(f"- {item} x{quantity}" for item, quantity in items)
     
-    message = f"""Hi {name},
-
-Thank you for your order of the following items:
-{item_list}
-
-Your total is Rs{total_balance:.2f}. Could you kindly confirm your order so we can proceed with dispatching it?
-
-Looking forward to your confirmation!
-
-Best regards,
-ASH Homes Customer Support"""
+    message = (
+        f"Hi {name},\n\n"
+        "Thank you for your order of the following items:\n"
+        f"{item_list}\n\n"
+        f"Your total is Rs{total_balance:.2f}. Could you kindly confirm your order "
+        "so we can proceed with dispatching it?\n\n"
+        "Looking forward to your confirmation!\n\n"
+        "Best regards,\n"
+        "ASH Homes Customer Support"
+    )
 
     print(f"Preparing to send message to {name} at {phone_number}...")
 
     try:
-        pwk.sendwhatmsg_instantly(phone_number, message, wait_time=15, tab_close=False)
-        
+        pwk.sendwhatmsg_instantly(phone_number, message, wait_time=20, tab_close=False)
+
         print("Waiting for WhatsApp to load and draft message...")
-        time.sleep(15)  # Initial wait for WhatsApp to load and draft message
+        time.sleep(20)  # Extra wait to ensure message is typed completely
 
-        pyautogui.press('enter')  # Send the message
-        pyautogui.press('enter')  # Send the message
-        pyautogui.press('enter')  # Send the message
+        pyautogui.press('enter')  # Send the message once
 
-        time.sleep(5)
+        if send_poll:
+            send_yes_no_poll()
+
+        time.sleep(10)
         pyautogui.press('esc')  # Dismiss any popup if appears
         
         last_success["name"] = name
@@ -78,7 +84,14 @@ def process_messages(df):
         # Format the phone number correctly
         shipping_phone = "+92" + shipping_phone[-10:]
 
-        send_confirmation_message(billing_name, items, total_payment, shipping_phone, last_success)
+        send_confirmation_message(
+            billing_name,
+            items,
+            total_payment,
+            shipping_phone,
+            last_success,
+            send_poll=True,
+        )
 
 # Main execution
 file_path = select_file()
